@@ -444,7 +444,7 @@
             <div class="info-val" id="idealWeight">—</div>
           </div>
           <div class="info-item">
-            <div class="info-label">ต้องปรับน้ำหนัก</div>
+            <div class="info-label">ต้องลด / เพิ่ม</div>
             <div class="info-val" id="weightDiff">—</div>
           </div>
         </div>
@@ -565,16 +565,24 @@
     const idealMin = Math.round(18.5 * heightM * heightM * 10) / 10;
     const idealMax = Math.round(22.9 * heightM * heightM * 10) / 10;
 
+    // diff = 0 if already in range, negative = need to lose, positive = need to gain
+    let diffKg = 0;
+    if (weightKg > idealMax) diffKg = Math.round((weightKg - idealMax) * 10) / 10;
+    else if (weightKg < idealMin) diffKg = Math.round((weightKg - idealMin) * 10) / 10;
+
     if (unit === 'imperial') {
       const idealMinLbs = Math.round(idealMin / 0.453592 * 10) / 10;
       const idealMaxLbs = Math.round(idealMax / 0.453592 * 10) / 10;
       document.getElementById('idealWeight').textContent = `${idealMinLbs}–${idealMaxLbs} lbs`;
-      const diffLbs = Math.round((weightKg - (idealMin + idealMax) / 2) / 0.453592 * 10) / 10;
-      document.getElementById('weightDiff').textContent = diffLbs > 0 ? `+${diffLbs} lbs` : `${diffLbs} lbs`;
+      const diffLbs = Math.round(diffKg / 0.453592 * 10) / 10;
+      document.getElementById('weightDiff').textContent =
+        diffLbs === 0 ? 'อยู่ในเกณฑ์ ✓' :
+        diffLbs > 0 ? `ลด ${diffLbs} lbs` : `เพิ่ม ${Math.abs(diffLbs)} lbs`;
     } else {
       document.getElementById('idealWeight').textContent = `${idealMin}–${idealMax} kg`;
-      const diff = Math.round((weightKg - (idealMin + idealMax) / 2) * 10) / 10;
-      document.getElementById('weightDiff').textContent = diff > 0 ? `+${diff} kg` : `${diff} kg`;
+      document.getElementById('weightDiff').textContent =
+        diffKg === 0 ? 'อยู่ในเกณฑ์ ✓' :
+        diffKg > 0 ? `ลด ${diffKg} kg` : `เพิ่ม ${Math.abs(diffKg)} kg`;
     }
 
     document.getElementById('result').classList.add('show');
